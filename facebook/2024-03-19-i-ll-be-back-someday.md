@@ -1,0 +1,27 @@
+---
+title: "I'll be back someday..."
+date: "2024-03-19"
+display_date: "2024-03-19, 8:53 AM CDT"
+source: "facebook"
+context: "timeline"
+tags: [travel, nature, photography]
+---
+# I'll be back someday...
+
+I'll be back someday...
+
+![](../images/facebook/3f29fb2f13cf7689.jpg)
+
+![](../images/facebook/4cf8312608351121.jpg)
+
+![](../images/facebook/62ceae0fe2fb8d2a.jpg)
+
+![](../images/facebook/7354a1980ec32801.jpg)
+
+![](../images/facebook/c147e12107bcc68b.jpg)
+
+![](../images/facebook/6b650241da8495d6.jpg)
+
+![](../images/facebook/6a7228935ad8242c.jpg)
+
+![](../images/facebook/25f557f994e6a79e.jpg)

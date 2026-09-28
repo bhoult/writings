@@ -1,0 +1,1002 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Writings Archive (live)</title>
+<style>
+:root {
+  --bg: #f4efe5; --panel: #faf7f0; --paper: #fffdf8; --ink: #28231d; --muted: #766c5f; --faint: #a59b8d;
+  --rule: #e2d9c9; --hover: #efe8da; --sel: #e6ecd9; --accent: #4d6a35; --mark: #f5dc7a;
+  --mi: #4d6a35; --quora: #a8322d; --facebook: #3b5c9e;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Charter, Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #151412; --panel: #1b1a17; --paper: #201e1b; --ink: #e9e3d7; --muted: #a79e90; --faint: #756d62;
+    --rule: #332f29; --hover: #28251f; --sel: #2c3524; --accent: #a8c585; --mark: #6b5a17;
+    --mi: #a8c585; --quora: #e0837c; --facebook: #8fa8e0; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #151412; --panel: #1b1a17; --paper: #201e1b; --ink: #e9e3d7; --muted: #a79e90; --faint: #756d62;
+  --rule: #332f29; --hover: #28251f; --sel: #2c3524; --accent: #a8c585; --mark: #6b5a17;
+  --mi: #a8c585; --quora: #e0837c; --facebook: #8fa8e0; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--sans); overflow: hidden; }
+button { font: inherit; color: inherit; }
+mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1px; }
+
+.app { display: grid; grid-template-rows: auto 1fr; height: 100vh; }
+.top { display: flex; align-items: center; gap: 1rem; padding: .7rem 1.1rem; border-bottom: 1px solid var(--rule); background: var(--panel); }
+.brand { font: 400 1.35rem/1 var(--serif); white-space: nowrap; letter-spacing: -.01em; }
+.brand small { display: block; font: .7rem var(--sans); color: var(--muted); letter-spacing: .04em; margin-top: .2rem; }
+.search { flex: 1; position: relative; max-width: 44rem; }
+.search input { width: 100%; font: 1rem var(--sans); padding: .6rem .9rem .6rem 2.3rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); color: var(--ink); outline: none; }
+.search input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+.search svg { position: absolute; left: .75rem; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--muted); }
+.search kbd { position: absolute; right: .7rem; top: 50%; transform: translateY(-50%); font: .7rem var(--sans); color: var(--faint); border: 1px solid var(--rule); border-radius: 4px; padding: 0 .35rem; }
+.top .tools { display: flex; gap: .5rem; align-items: center; }
+.btn { border: 1px solid var(--rule); background: var(--paper); border-radius: 8px; padding: .4rem .7rem; cursor: pointer; font-size: .8rem; color: var(--muted); }
+.btn:hover { color: var(--ink); border-color: var(--faint); }
+select.btn { appearance: none; padding-right: 1.6rem; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 12px) 55%, calc(100% - 8px) 55%; background-size: 4px 4px; background-repeat: no-repeat; }
+.filters-toggle { display: none; }
+
+.main { display: grid; grid-template-columns: 250px 390px minmax(0, 1fr); min-height: 0; }
+aside.index { overflow-y: auto; padding: 1rem .9rem 2rem 1.1rem; border-right: 1px solid var(--rule); background: var(--panel); font-size: .85rem; }
+.facet { margin-bottom: 1.4rem; }
+.facet h3 { font: 700 .68rem var(--sans); letter-spacing: .13em; text-transform: uppercase; color: var(--muted); margin: 0 0 .45rem; display: flex; justify-content: space-between; }
+.facet h3 button { border: 0; background: none; color: var(--accent); cursor: pointer; font: 600 .68rem var(--sans); letter-spacing: .05em; padding: 0; }
+.opt { display: flex; align-items: center; gap: .5rem; width: 100%; border: 0; background: none; padding: .3rem .45rem; border-radius: 6px; cursor: pointer; text-align: left; color: var(--ink); }
+.opt:hover { background: var(--hover); }
+.opt.on { background: var(--sel); font-weight: 600; }
+.opt .n { margin-left: auto; color: var(--faint); font-variant-numeric: tabular-nums; font-size: .78rem; }
+.opt .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.opt .bar { flex: 1; height: 4px; background: var(--rule); border-radius: 2px; overflow: hidden; max-width: 70px; }
+.opt .bar i { display: block; height: 100%; background: var(--accent); opacity: .55; }
+.opt.check::before { content: ""; width: 13px; height: 13px; border: 1.5px solid var(--faint); border-radius: 3px; flex: none; }
+.opt.check.on::before { background: var(--accent); border-color: var(--accent); box-shadow: inset 0 0 0 2px var(--panel); }
+.more { border: 0; background: none; color: var(--accent); cursor: pointer; font-size: .78rem; padding: .25rem .45rem; }
+
+section.results { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--rule); background: var(--panel); }
+.rhead { padding: .6rem 1rem; border-bottom: 1px solid var(--rule); font-size: .8rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; min-height: 2.6rem; }
+.rhead .pill { background: var(--sel); color: var(--ink); border: 0; border-radius: 999px; padding: .15rem .55rem; cursor: pointer; font-size: .75rem; }
+.rhead .pill::after { content: " ×"; color: var(--muted); }
+.list { overflow-y: auto; flex: 1; }
+.grp { position: sticky; top: 0; z-index: 1; background: var(--panel); font: 700 .7rem var(--sans); letter-spacing: .12em; color: var(--accent); padding: .55rem 1rem .35rem; border-bottom: 1px solid var(--rule); }
+.item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .75rem; padding: .75rem 1rem; border-bottom: 1px solid var(--rule); cursor: pointer; }
+.item:hover { background: var(--hover); }
+.item.sel { background: var(--sel); box-shadow: inset 3px 0 0 var(--accent); }
+.item .meta { display: flex; gap: .45rem; align-items: center; font-size: .72rem; color: var(--muted); margin-bottom: .15rem; }
+.badge { font-weight: 700; letter-spacing: .04em; text-transform: uppercase; font-size: .62rem; }
+.item .ttl { font: 600 .95rem/1.3 var(--serif); margin-bottom: .2rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.item .snip { font-size: .8rem; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.item img.th { width: 58px; height: 58px; object-fit: cover; border-radius: 6px; background: var(--rule); }
+.empty { padding: 3rem 1.5rem; text-align: center; color: var(--muted); }
+
+article.reader { overflow-y: auto; background: var(--paper); min-width: 0; }
+.doc { max-width: 44rem; margin: 0 auto; padding: 2.6rem 2.5rem 5rem; }
+.doc .meta { display: flex; flex-wrap: wrap; gap: .4rem 1rem; align-items: center; font-size: .78rem; color: var(--muted); margin-bottom: .6rem; }
+.doc .meta a { color: var(--muted); }
+.doc h1 { font: 500 clamp(1.6rem, 2.6vw, 2.2rem)/1.2 var(--serif); margin: .2rem 0 1.4rem; letter-spacing: -.005em; }
+.doc .body { font: 1.12rem/1.72 var(--serif); overflow-wrap: break-word; }
+.doc .body p { margin: 0 0 1.05em; }
+.doc .body h2, .doc .body h3, .doc .body h4 { font-family: var(--serif); line-height: 1.3; margin: 1.6em 0 .5em; }
+.doc .body blockquote { margin: 1.2em 0; padding-left: 1.1em; border-left: 3px solid var(--accent); color: var(--muted); font-style: italic; }
+.doc .body a { color: var(--accent); }
+.doc .media { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: .5rem; margin: 1.2rem 0; }
+.doc .media:has(> :only-child) { grid-template-columns: 1fr; }
+.doc .media img, .doc .media video { width: 100%; border-radius: 6px; background: var(--rule); display: block; }
+.doc .media img { aspect-ratio: 1; object-fit: cover; cursor: zoom-in; }
+.doc .media:has(> :only-child) img { aspect-ratio: auto; object-fit: contain; max-height: 75vh; }
+.doc .body > img { max-width: 100%; border-radius: 6px; }
+.doc .tags { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: 2rem; }
+.doc .tags button { border: 1px solid var(--rule); background: none; border-radius: 999px; padding: .2rem .6rem; font-size: .75rem; color: var(--muted); cursor: pointer; }
+.nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--rule); }
+.nav button { max-width: 48%; text-align: left; border: 0; background: none; cursor: pointer; color: var(--muted); font-size: .8rem; }
+.nav button:last-child { text-align: right; margin-left: auto; }
+.nav button b { display: block; color: var(--ink); font: 600 .95rem var(--serif); }
+/* comments (galedra-server/writings/comments) */
+.comments { margin-top: 3rem; padding-top: 1.4rem; border-top: 1px solid var(--rule); }
+.comments h2 { font: 600 1.1rem var(--serif); margin: 0 0 .6rem; }
+.comments h2 small { color: var(--muted); font-weight: 400; }
+.comment { padding: .8rem 0; border-bottom: 1px solid var(--rule); }
+.comment .who { display: flex; flex-wrap: wrap; gap: .2rem .7rem; align-items: baseline; font-size: .76rem; color: var(--muted); margin-bottom: .25rem; }
+.comment .who b { color: var(--ink); font-weight: 600; font-size: .85rem; }
+.comment p { margin: 0; font: 1rem/1.6 var(--serif); overflow-wrap: anywhere; }
+.comments .quiet { color: var(--muted); font-size: .85rem; margin: .4rem 0; }
+form.say { margin-top: 1.2rem; display: grid; gap: .5rem; }
+form.say textarea, form.say input { font: inherit; font-size: .95rem; color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: .55rem .7rem; }
+form.say textarea { resize: vertical; min-height: 5.5rem; font-family: var(--serif); line-height: 1.5; }
+form.say textarea:focus, form.say input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+form.say .row { display: flex; gap: .5rem; }
+form.say .row input { flex: 1; min-width: 0; }
+form.say .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--paper); font-weight: 600; padding: .45rem 1rem; }
+form.say .btn:disabled { opacity: .6; cursor: wait; }
+form.say .rules, form.say .status { margin: 0; font-size: .78rem; color: var(--muted); }
+form.say .status { color: var(--accent); min-height: 1.2em; }
+form.say .status.bad { color: var(--quora); }
+form.say .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.comment .who .to { color: var(--muted); }
+.comment .act { border: 0; background: none; color: var(--accent); cursor: pointer; font-size: .76rem; padding: 0; }
+.comment .act[data-reply] { margin-left: auto; }
+.comment .act.del { color: var(--quora); }
+.comment.gone > .who b, .comment.gone > p { color: var(--faint); font-style: italic; }
+.comment .replies { margin: .3rem 0 0 1rem; padding-left: .9rem; border-left: 2px solid var(--rule); }
+.comment .replies:empty { display: none; }
+.comment .replies.flat { margin-left: 0; padding-left: 0; border-left: 0; }
+.comment .replies > .comment:last-child { border-bottom: 0; padding-bottom: .2rem; }
+form.say.sub { margin: .6rem 0 .3rem; }
+.comments .mod { margin-top: 1.4rem; font-size: .75rem; color: var(--faint); }
+.comments .mod > button { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: .75rem; padding: 0; text-decoration: underline; }
+form.signin { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+form.signin input { font: inherit; font-size: .85rem; color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: .4rem .6rem; }
+form.signin .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--paper); font-weight: 600; }
+form.signin .status { flex-basis: 100%; margin: 0; font-size: .78rem; color: var(--accent); min-height: 1em; }
+form.signin .status.bad { color: var(--quora); }
+.back { display: none; }
+.welcome { max-width: 36rem; margin: 12vh auto 0; padding: 0 2rem; text-align: center; color: var(--muted); }
+.welcome h2 { font: 400 2rem var(--serif); color: var(--ink); margin: 0 0 .6rem; }
+.welcome .stats { display: flex; justify-content: center; gap: 2rem; margin: 2rem 0; }
+.welcome .stats b { display: block; font: 400 2rem var(--serif); color: var(--ink); }
+.welcome p { font-size: .9rem; }
+.welcome code { font-size: .8rem; background: var(--hover); padding: .1rem .35rem; border-radius: 4px; }
+
+.lightbox { position: fixed; inset: 0; background: rgba(10,9,8,.92); display: none; align-items: center; justify-content: center; z-index: 50; }
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 94vw; max-height: 90vh; object-fit: contain; }
+.lightbox button { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,.1); color: #fff; border: 0; font-size: 2rem; width: 3rem; height: 4rem; cursor: pointer; border-radius: 8px; }
+.lightbox .prev { left: 1rem; } .lightbox .next { right: 1rem; }
+.lightbox .count { position: absolute; bottom: 1rem; left: 0; right: 0; text-align: center; color: #bbb; font-size: .8rem; }
+.gate { position: fixed; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; padding: 1rem; background: color-mix(in srgb, var(--bg) 88%, transparent); }
+.gate[hidden] { display: none; }
+.gate .card { max-width: 30rem; background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; padding: 1.6rem 1.7rem; box-shadow: 0 10px 40px rgba(0,0,0,.12); }
+.gate h2 { font: 400 1.5rem/1.2 var(--serif); margin: 0 0 .6rem; }
+.gate p { margin: 0 0 1rem; color: var(--muted); }
+.gate p.err { color: var(--quora); }
+.gate code { font-size: .85em; background: var(--hover); padding: 0 .3em; border-radius: 4px; }
+.gate .row { display: flex; flex-wrap: wrap; gap: .5rem; }
+.gate .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--paper); font-weight: 600; }
+.gate progress { width: 100%; accent-color: var(--accent); }
+
+@media (max-width: 1100px) {
+  .main { grid-template-columns: 340px minmax(0, 1fr); }
+  aside.index { position: fixed; z-index: 20; top: 0; bottom: 0; left: 0; width: 290px; transform: translateX(-100%); transition: transform .2s; box-shadow: 0 0 40px rgba(0,0,0,.2); }
+  aside.index.open { transform: none; }
+  .filters-toggle { display: inline-block; }
+}
+@media (max-width: 720px) {
+  .top { flex-wrap: wrap; gap: .6rem; padding: .6rem .8rem; }
+  .brand small { display: none; }
+  .search { order: 3; flex-basis: 100%; }
+  .search kbd { display: none; }
+  .main { grid-template-columns: minmax(0, 1fr); }
+  .top .tools { margin-left: auto; }
+  article.reader { position: fixed; inset: 0; z-index: 15; transform: translateX(100%); transition: transform .2s; }
+  body.reading article.reader { transform: none; }
+  .back { display: inline-block; position: sticky; top: 0; margin: .6rem; z-index: 2; }
+  .doc { padding: 1rem 1.2rem 4rem; }
+  .welcome { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <button class="btn filters-toggle" id="ft">☰ Index</button>
+    <div class="brand">Writings<small id="sub"></small></div>
+    <label class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder='Search everything… try "geodesic dome", bear, -birthday' autocomplete="off">
+      <kbd>/</kbd>
+    </label>
+    <div class="tools">
+      <select class="btn" id="sort" aria-label="Sort">
+        <option value="rel">Best match</option><option value="new">Newest first</option><option value="old">Oldest first</option><option value="long">Longest first</option><option value="comments">Latest comments</option>
+      </select>
+      <button class="btn" id="theme" title="Light / dark" aria-label="Toggle light or dark theme"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
+    </div>
+  </header>
+  <div class="main">
+    <aside class="index" id="index"></aside>
+    <section class="results"><div class="rhead" id="rhead"></div><div class="list" id="list"></div></section>
+    <article class="reader" id="reader"></article>
+  </div>
+</div>
+<div class="lightbox" id="lb"><img alt=""><button class="prev">‹</button><button class="next">›</button><div class="count"></div></div>
+<div class="gate" id="gate"><div class="card"><h2>Writings</h2><p>Loading…</p></div></div>
+<script>
+// ---------- live loader: finds and parses the Markdown files itself, so there is no build step.
+// Over http(s) (e.g. `python3 -m http.server` in this folder) it reads the server's directory listings.
+// From file:// the browser won't let a page list folders, so you pick the writings folder once;
+// Chrome remembers it (the handle is kept in IndexedDB) and only asks to re-allow access.
+// Parsed pieces are cached in IndexedDB by size and modification time, so a repeat visit
+// reads only new or changed files; editing this script empties the cache. A first visit takes
+// what it can from the server's index.json (built from this same script by
+// galedra-server/writings/build-index.mjs) instead of fetching every file.
+// Port of build_viewer.py — keep the two in step.
+const LIVE = (() => {
+// size and modification time to the millisecond, however the listing reports them
+const stamp = (size, ms) => `${size}:${Math.floor(ms)}`;
+const PARSER = (s => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619); return (h >>> 0).toString(36); })(document.currentScript.textContent);
+const SOURCES = {facebook: 'Facebook', quora: 'Quora', 'minimal-intentions': 'Minimal Intentions'};
+const escT = s => s.replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]));
+const escA = s => s.replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;'}[c]));
+const utf8 = new TextDecoder('utf-8', {fatal: true});
+
+function fixMojibake(s) {
+  return s.replace(/[\xc2-\xf4][\x80-\xbf]{1,3}/g, m => {
+    try { return utf8.decode(Uint8Array.from(m, c => c.charCodeAt(0))); } catch (e) { return m; }
+  });
+}
+function frontmatter(text) {
+  const meta = {}; let body = text;
+  const m = text.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)/);
+  if (m) {
+    body = m[2];
+    for (const line of m[1].split('\n')) {
+      const c = line.indexOf(':'), k = c < 0 ? line : line.slice(0, c);
+      let v = c < 0 ? '' : line.slice(c + 1).trim();
+      if (!k || k.startsWith(' ')) continue;
+      if (v.startsWith('[') && v.endsWith(']')) v = v.slice(1, -1).split(',').filter(t => t.trim()).map(t => t.trim().replace(/^"+|"+$/g, ''));
+      else v = v.replace(/^"+|"+$/g, '');
+      meta[k.trim()] = v;
+    }
+  }
+  return [meta, body];
+}
+function mediaPath(src, folder) {
+  if (/^https?:\/\//.test(src)) return src;
+  const out = [];
+  for (const p of (src.startsWith('/') ? src : folder + '/' + src).split('/')) {
+    if (p === '..' && out.length && out[out.length - 1] !== '..' && out[out.length - 1] !== '') out.pop();
+    else if (p !== '.' && (p || !out.length)) out.push(p);
+  }
+  return out.join('/') || '.';
+}
+const INLINE = /!\[(?<alt>[^\]]*)\]\((?<img>[^)\s]+)\)|\[video\]\((?<vid>[^)\s]+)\)|\[(?<lt>[^\]]+)\]\((?<href>[^)\s]+)\)|(?<url>https?:\/\/[^\s<>"')\]]+)|\*\*(?<b>[^*]+)\*\*|\*(?<i>[^*\n]+)\*/g;
+function inline(text, folder, media) {
+  const out = []; let pos = 0;
+  for (const m of text.matchAll(INLINE)) {
+    const g = m.groups;
+    out.push(escT(text.slice(pos, m.index)));
+    pos = m.index + m[0].length;
+    if (g.img) {
+      const p = mediaPath(g.img, folder); media.push(['img', p]);
+      out.push(`<img src="${escA(p)}" alt="${escA(g.alt)}" loading="lazy">`);
+    } else if (g.vid) {
+      const p = mediaPath(g.vid, folder); media.push(['vid', p]);
+      out.push(`<video src="${escA(p)}" controls preload="metadata"></video>`);
+    } else if (g.href) {
+      let label = g.lt; const href = g.href;
+      if (label === 'link' && text.slice(0, m.index).includes(href)) continue;  // facebook exports repeat the URL as a trailing [link](...) — drop the duplicate
+      if (label === 'link') label = href.replace(/^(https?:\/\/)?(www\.)?([^/]+).*/, '$3') + ' ↗';
+      out.push(`<a href="${escA(/^(https?:|mailto:)/.test(href) ? href : mediaPath(href, folder))}" target="_blank" rel="noopener">${escA(label)}</a>`);
+    } else if (g.url) {
+      const u = g.url.replace(/[.,;:!?]+$/, ''), tail = g.url.slice(u.length);
+      out.push(`<a href="${escA(u)}" target="_blank" rel="noopener">${escA(u)}</a>${escA(tail)}`);
+    } else if (g.b) out.push(`<strong>${escA(g.b)}</strong>`);
+    else if (g.i) out.push(`<em>${escA(g.i)}</em>`);
+  }
+  out.push(escT(text.slice(pos)));
+  return out.join('');
+}
+function render(body, folder, media) {
+  const out = [], inl = s => inline(s, folder, media);
+  for (const b of body.trim().split(/\n\s*\n/)) {
+    const lines = b.replace(/^\n+|\n+$/g, '').split('\n').map(l => l.trimEnd());
+    if (!lines.some(Boolean)) continue;
+    const full = lines.filter(l => l.trim()), every = re => full.every(l => re.test(l));
+    const first = lines[0].trimStart();
+    if (/^#{1,6} /.test(first) && lines.length === 1) {
+      const level = Math.min(4, first.length - first.replace(/^#+/, '').length + 1);
+      out.push(`<h${level}>${inl(first.replace(/^#+/, '').trim())}</h${level}>`);
+    } else if (every(/^\s*[-*+] /)) out.push('<ul>' + full.map(l => `<li>${inl(l.replace(/^\s*[-*+] /, ''))}</li>`).join('') + '</ul>');
+    else if (every(/^\s*\d+[.)] /)) out.push('<ol>' + full.map(l => `<li>${inl(l.replace(/^\s*\d+[.)] /, ''))}</li>`).join('') + '</ol>');
+    else if (full.every(l => l.startsWith('>'))) out.push('<blockquote>' + lines.map(l => inl(l.replace(/^[> ]+/, ''))).join('<br>') + '</blockquote>');
+    else if (every(/^\s*(!\[[^\]]*\]\([^)]+\)|\[video\]\([^)]+\))\s*$/)) out.push('<div class="media">' + full.map(l => inl(l.trim())).join('') + '</div>');
+    else if (full.every(l => l.startsWith('    '))) out.push('<p>' + lines.map(l => inl(l.trim())).join('<br>') + '</p>');
+    else out.push('<p>' + lines.map(inl).join('<br>') + '</p>');
+  }
+  return out.join('\n').replace(/<\/div>\n<div class="media">/g, '');  // merge consecutive single-media blocks into one gallery
+}
+function plain(body) {
+  return body.replace(/!\[[^\]]*\]\([^)]*\)|\[video\]\([^)]*\)/g, ' ').replace(/\[link\]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[*#>]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+const words = s => s.toLowerCase().replace(/[^\p{L}\p{N}_]+/gu, ' ').trim();
+
+function parseDoc(src, name, raw) {
+  const [meta, body0] = frontmatter(fixMojibake(raw));
+  const stem = name.slice(0, -3);
+  const title = meta.title || stem.slice(11).replace(/-/g, ' ');
+  let body = body0.replace(/^\s*# .*\n/, '');  // title is shown separately
+  let loc = '';
+  const lm = body.match(/^\*Location: (.+?)\*\s*$/m);
+  if (lm) { loc = lm[1].trim(); body = body.slice(0, lm.index) + body.slice(lm.index + lm[0].length); }
+  const text = plain(body);
+  // facebook titles are the first words of the post: don't print them twice
+  const tCore = words(title);
+  const st = !(src === 'facebook' && tCore && words(text).startsWith([...tCore].slice(0, 60).join('')));
+  const media = [], h = render(body, src, media);
+  const d = meta.date || '', dd = 'display_date' in meta ? meta.display_date : d;
+  let tags = meta.tags || [];
+  if (typeof tags === 'string') tags = [tags];
+  tags = tags.flatMap(t => t.split('|')).map(t => t.trim()).filter(Boolean);
+  return {
+    id: `${src}/${stem}`, s: src, t: title, d, y: d ? d.slice(0, 4) : ((dd || '').match(/(19|20)\d\d/) || [''])[0], dd,
+    ctx: meta.context || '', u: meta.url || '', loc, tags, x: text, h, st,
+    th: (media.find(([k]) => k === 'img') || [])[1] || '',
+    ni: media.filter(([k]) => k === 'img').length, nv: media.filter(([k]) => k === 'vid').length,
+    w: text ? text.split(' ').length : 0,
+  };
+}
+
+// ---------- finding the files. Each entry: {src, name, stamp, read() -> Promise<text>};
+// stamp (size and modification time) is null where the listing doesn't say, and then the
+// file is always read.
+async function fromHttp() {
+  const files = [];
+  for (const src of Object.keys(SOURCES)) {
+    const base = new URL(src + '/', location.href);
+    // Caddy's file_server browse answers in JSON when asked, with sizes and times
+    const r = await fetch(base, {cache: 'no-cache', headers: {Accept: 'application/json, text/html;q=0.9'}});
+    if (!r.ok) continue;
+    if ((r.headers.get('content-type') || '').includes('json')) {
+      for (const e of await r.json()) {
+        if (e.is_dir || !e.name.endsWith('.md')) continue;
+        const u = new URL(e.url, base);
+        const ms = Date.parse(e.mod_time.replace(/\.(\d+)/, (_, d) => '.' + (d + '00').slice(0, 3)));  // RFC 3339 with up to 9 fraction digits
+        files.push({src, name: e.name, stamp: stamp(e.size, ms), read: () => fetch(u, {cache: 'no-cache'}).then(r => r.text())});
+      }
+      continue;
+    }
+    const dom = new DOMParser().parseFromString(await r.text(), 'text/html'), seen = new Set();
+    for (const a of dom.querySelectorAll('a[href]')) {
+      const u = new URL(a.getAttribute('href'), base);
+      if (u.origin !== base.origin || !u.pathname.startsWith(base.pathname)) continue;
+      const name = decodeURIComponent(u.pathname.slice(base.pathname.length));
+      if (!name.endsWith('.md') || name.includes('/') || seen.has(name)) continue;
+      seen.add(name);
+      files.push({src, name, stamp: null, read: () => fetch(u, {cache: 'no-cache'}).then(r => r.text())});
+    }
+  }
+  return files;
+}
+async function fromHandle(dir) {
+  const scan = async root => {
+    const files = [];
+    for (const src of Object.keys(SOURCES)) {
+      let sub; try { sub = await root.getDirectoryHandle(src); } catch (e) { continue; }
+      const handles = [];
+      for await (const [name, h] of sub.entries()) if (h.kind === 'file' && name.endsWith('.md')) handles.push(h);
+      for (const f of await Promise.all(handles.map(h => h.getFile())))
+        files.push({src, name: f.name, stamp: stamp(f.size, f.lastModified), read: () => f.text()});
+    }
+    return files;
+  };
+  let files = await scan(dir);
+  if (!files.length) { try { files = await scan(await dir.getDirectoryHandle('writings')); } catch (e) {} }  // picked the parent folder
+  return files;
+}
+function fromFileList(list) {
+  return [...list].flatMap(f => {
+    const parts = (f.webkitRelativePath || f.name).split('/'), src = parts[parts.length - 2];
+    return f.name.endsWith('.md') && src in SOURCES ? [{src, name: f.name, stamp: stamp(f.size, f.lastModified), read: () => f.text()}] : [];
+  });
+}
+
+// the folder handle survives reloads in IndexedDB (Chrome/Edge)
+function idb(mode, fn) {
+  return new Promise((ok, bad) => {
+    const rq = indexedDB.open('writings-live', 1);
+    rq.onupgradeneeded = () => rq.result.createObjectStore('kv');
+    rq.onerror = () => bad(rq.error);
+    rq.onsuccess = () => {
+      const tx = rq.result.transaction('kv', mode), r = fn(tx.objectStore('kv'));
+      tx.oncomplete = () => ok(r.result); tx.onerror = () => bad(tx.error);
+    };
+  });
+}
+const saveDir = h => idb('readwrite', s => s.put(h, 'dir')).catch(() => {});
+const savedDir = () => idb('readonly', s => s.get('dir')).catch(() => null);
+// the parsed pieces, per place they were read from: {parser, entries: {"src/name": [stamp, doc]}}
+const loadCache = where => idb('readonly', s => s.get('docs:' + where)).catch(() => null);
+const saveCache = (where, entries) => idb('readwrite', s => s.put({parser: PARSER, entries}, 'docs:' + where)).catch(() => {});
+
+// ---------- gate UI
+const gateEl = document.getElementById('gate');
+function gate(html) { gateEl.hidden = false; gateEl.querySelector('.card').innerHTML = html; return gateEl.querySelector('.card'); }
+const escH = s => escA(String(s));
+
+// resolves once the user has picked (or re-allowed) a folder that holds writings
+function askForFolder(saved, note) {
+  return new Promise(resolve => {
+    const fsa = 'showDirectoryPicker' in window;
+    const card = gate(`<h2>Open your writings</h2>
+      ${note ? `<p class="err">${note}</p>` : ''}
+      <p>${saved ? `Allow this page to read <code>${escH(saved.name)}</code> again.` :
+        `Pick the <code>writings</code> folder (the one holding <code>facebook</code>, <code>quora</code> and <code>minimal-intentions</code>).
+         ${fsa ? 'The browser will remember it.' : ''}`}
+      New or changed files show up every time you open this page — nothing to rebuild.</p>
+      <div class="row">${saved ? `<button class="btn primary" id="g-again">Open “${escH(saved.name)}”</button>` : ''}
+      <button class="btn${saved ? '' : ' primary'}" id="g-pick">${saved ? 'Choose another folder…' : 'Choose folder…'}</button></div>
+      <p style="margin:1rem 0 0;font-size:.8rem">Or serve this folder (<code>python3 -m http.server</code>) and open it over http — then no folder prompt at all.</p>
+      <input type="file" id="g-input" webkitdirectory multiple hidden>`);
+    const again = card.querySelector('#g-again'), input = card.querySelector('#g-input');
+    if (again) again.onclick = async () => {
+      if (await saved.requestPermission({mode: 'read'}) === 'granted') resolve({handle: saved});
+    };
+    card.querySelector('#g-pick').onclick = async () => {
+      if (!fsa) { input.click(); return; }
+      try { resolve({handle: await showDirectoryPicker({id: 'writings', mode: 'read'})}); }
+      catch (e) { if (e.name !== 'AbortError') console.error(e); }
+    };
+    input.onchange = () => input.files.length && resolve({list: input.files});
+  });
+}
+async function fromFolder() {
+  let saved = 'showDirectoryPicker' in window ? await savedDir() : null, note = '';
+  if (saved) {
+    try { if (await saved.queryPermission({mode: 'read'}) === 'granted') { const f = await fromHandle(saved); if (f.length) return f; } }
+    catch (e) { saved = null; }  // folder moved or deleted
+  }
+  for (;;) {
+    const pick = await askForFolder(saved, note);
+    let files = [];
+    try { files = pick.handle ? await fromHandle(pick.handle) : fromFileList(pick.list); } catch (e) { console.error(e); }
+    if (files.length) { if (pick.handle) saveDir(pick.handle); return files; }
+    note = `No writings found in <code>${escH(pick.handle ? pick.handle.name : 'that folder')}</code>.`;
+  }
+}
+
+async function pool(items, n, fn) {
+  let next = 0; const out = new Array(items.length);
+  await Promise.all(Array.from({length: n}, async () => { while (next < items.length) { const k = next++; out[k] = await fn(items[k]); } }));
+  return out;
+}
+
+async function load() {
+  const t0 = performance.now();
+  let files = [], where = new URL('.', location.href).href;
+  if (/^https?:$/.test(location.protocol)) { try { files = await fromHttp(); } catch (e) { console.warn('no directory listing', e); } }
+  if (!files.length) { files = await fromFolder(); where = 'folder'; }
+  const cache = await loadCache(where);
+  const old = cache && cache.parser === PARSER ? cache.entries : {};
+  const entries = {};
+  let todo = [], fromIndex = 0;
+  for (const f of files) {
+    const k = f.src + '/' + f.name, hit = old[k];
+    if (f.stamp && hit && hit[0] === f.stamp) entries[k] = hit; else todo.push(f);
+  }
+  // many misses (a first visit): one download of the server's index beats a request per file
+  if (todo.length > 50 && where !== 'folder') {
+    try {
+      const r = await fetch(new URL('index.json', location.href), {cache: 'no-cache'});
+      const idx = r.ok ? await r.json() : null;
+      if (idx && idx.parser === PARSER) todo = todo.filter(f => {
+        const k = f.src + '/' + f.name, e = idx.entries[k];
+        if (!(f.stamp && e && e[0] === f.stamp)) return true;
+        entries[k] = e; fromIndex++; return false;
+      });
+    } catch (e) { console.warn('no usable index.json', e); }
+  }
+  if (todo.length) {
+    const card = gate(`<h2>Reading…</h2><p><span id="g-n">0</span> of ${todo.length.toLocaleString()} ${todo.length < files.length ? 'new or changed ' : ''}files</p><progress max="${todo.length}" value="0"></progress>`);
+    const bar = card.querySelector('progress'), n = card.querySelector('#g-n');
+    let done = 0;
+    await pool(todo, 96, async f => {  // HTTP/2 multiplexes these; 24 at a time meant ~60 round trips to a remote server
+      try { entries[f.src + '/' + f.name] = [f.stamp, parseDoc(f.src, f.name, await f.read())]; }
+      catch (e) { console.error('could not read', f.src + '/' + f.name, e); }
+      finally { if (++done % 50 === 0 || done === todo.length) { bar.value = done; n.textContent = done.toLocaleString(); } }
+    });
+  }
+  // store before the viewer adds its search fields to these objects; files that are gone drop out
+  if (todo.length || Object.keys(old).length !== files.length) await saveCache(where, Object.fromEntries(Object.entries(entries).filter(([, e]) => e[0])));
+  const docs = Object.values(entries).map(e => e[1]);
+  const key = d => d.d || `${d.y || '0000'}-00-00`;
+  const desc = (a, b) => a < b ? 1 : a > b ? -1 : 0;  // code-point order, like Python's sort
+  docs.sort((a, b) => desc(key(a), key(b)) || desc(a.id, b.id));
+  gateEl.hidden = true;
+  const ms = Math.round(performance.now() - t0), took = ms < 1000 ? ms + ' ms' : (ms / 1000).toFixed(1) + ' s';
+  const how = fromIndex ? `from the server's index${todo.length ? ` + ${todo.length.toLocaleString()} read` : ''}` :
+    !todo.length ? 'from cache' : todo.length === files.length ? 'read live' : `${todo.length.toLocaleString()} new or changed, read`;
+  return {docs, sources: SOURCES, read: todo.length, fromIndex, built: `${how} in ${took}`};
+}
+return {load, parseDoc, stamp, PARSER, SOURCES};
+})();
+</script>
+<script>
+(async () => {
+const DATA = await LIVE.load();
+const DOCS = DATA.docs, SRC = DATA.sources;
+const COLOR = {facebook: 'var(--facebook)', quora: 'var(--quora)', 'minimal-intentions': 'var(--mi)'};
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+const fold = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+DOCS.forEach((d, i) => { d.i = i; d.ht = fold(d.t); d.hx = fold(d.x + ' ' + d.loc + ' ' + d.tags.join(' ')); });
+const byId = new Map(DOCS.map(d => [d.id, d]));
+const byTag = new Set(DOCS.flatMap(d => d.tags));
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fmtDate = d => d.d ? `${MONTHS[+d.d.slice(5,7)-1]} ${+d.d.slice(8,10)}, ${d.d.slice(0,4)}` : (d.dd || d.y || 'Undated');
+
+const state = {q: '', src: new Set(), year: null, tags: new Set(), place: null, photos: false, long: false, sort: 'rel', doc: null};
+let results = [], terms = [], shown = 0;
+
+// ---------- query parsing & scoring
+function parse(q) {
+  const out = [];
+  q.replace(/(-?)"([^"]+)"|(-?)(\S+)/g, (_, n1, ph, n2, w) => {
+    const neg = !!(n1 || n2), t = fold(ph || w);
+    if (t && t !== '-') out.push({t, neg});
+  });
+  return out;
+}
+function count(hay, t) { let n = 0, i = -1; while ((i = hay.indexOf(t, i + 1)) !== -1 && n < 20) n++; return n; }
+function score(d) {
+  let s = 0;
+  for (const {t, neg} of terms) {
+    const inT = d.ht.includes(t), c = count(d.hx, t);
+    if (neg) { if (inT || c) return -1; continue; }
+    if (!inT && !c) return -1;
+    s += (inT ? 12 : 0) + Math.min(c, 10) + (d.ht.startsWith(t) ? 4 : 0);
+  }
+  return s + Math.min(d.w, 2000) / 2000;
+}
+function passes(d, skip) {
+  if (skip !== 'src' && state.src.size && !state.src.has(d.s)) return false;
+  if (skip !== 'year' && state.year && d.y !== state.year) return false;
+  if (skip !== 'tag' && state.tags.size && ![...state.tags].every(t => d.tags.includes(t))) return false;
+  if (skip !== 'place' && state.place && d.loc !== state.place) return false;
+  if (skip !== 'photos' && state.photos && !(d.ni || d.nv)) return false;
+  if (skip !== 'long' && state.long && d.w < 150) return false;
+  return true;
+}
+
+// ---------- search + render list
+function run(keepScroll) {
+  terms = parse(state.q);
+  const scored = [];
+  for (const d of DOCS) {
+    const s = terms.length ? score(d) : 0;
+    if (s < 0) continue;
+    d._s = s; d._match = true;
+    scored.push(d);
+  }
+  DOCS.forEach(d => d._match = false); scored.forEach(d => d._match = true);
+  results = scored.filter(d => passes(d));
+  const sort = state.sort === 'rel' && !terms.some(t => !t.neg) ? 'new' : state.sort;
+  const key = d => d.d || (d.y ? d.y + '-00-00' : '0000');
+  if (sort === 'rel') results.sort((a, b) => b._s - a._s || key(b).localeCompare(key(a)));
+  else if (sort === 'new') results.sort((a, b) => key(b).localeCompare(key(a)));
+  else if (sort === 'old') results.sort((a, b) => key(a).localeCompare(key(b)));
+  else if (sort === 'comments') results.sort((a, b) => lastOf(b).localeCompare(lastOf(a)) || key(b).localeCompare(key(a)));
+  else results.sort((a, b) => b.w - a.w);
+  state.grouped = sort === 'new' || sort === 'old' || sort === 'comments';
+  state.sortUsed = sort;
+  renderIndex(); renderHead();
+  const list = $('#list');
+  if (!keepScroll) list.scrollTop = 0;
+  list.innerHTML = results.length ? '' : `<div class="empty">Nothing matches.<br><br><button class="btn" id="clr">Clear search and filters</button></div>`;
+  if (!results.length) { $('#clr').onclick = clearAll; }
+  shown = 0; more();
+  syncHash();
+}
+function snippet(d) {
+  const pos = terms.filter(t => !t.neg).map(t => d.x.toLowerCase().indexOf(t.t)).filter(i => i >= 0).sort((a, b) => a - b)[0];
+  let s = d.x;
+  if (pos > 60) s = '…' + s.slice(pos - 50);
+  return hl(esc(s.slice(0, 260)));
+}
+function hl(html) {
+  const ts = terms.filter(t => !t.neg).map(t => t.t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  return ts.length ? html.replace(new RegExp(`(${ts.join('|')})`, 'gi'), '<mark>$1</mark>') : html;
+}
+function more() {
+  const list = $('#list'), frag = document.createDocumentFragment();
+  const end = Math.min(results.length, shown + 120);
+  let lastGroup = shown ? groupOf(results[shown - 1]) : null;
+  for (let k = shown; k < end; k++) {
+    const d = results[k];
+    if (state.grouped) {
+      const g = groupOf(d);
+      if (g !== lastGroup) { const h = document.createElement('div'); h.className = 'grp'; h.textContent = g; frag.appendChild(h); lastGroup = g; }
+    }
+    const el = document.createElement('div');
+    el.className = 'item' + (state.doc === d.id ? ' sel' : '');
+    el.dataset.id = d.id;
+    const media = d.ni ? ` · ${d.ni} photo${d.ni > 1 ? 's' : ''}` : d.nv ? ` · video` : '';
+    const act = ACTIVITY[d.id], talk = act ? ` · 💬 ${act[0]}${state.sortUsed === 'comments' ? `, ${shortDate(act[1])}` : ''}` : '';
+    el.innerHTML = `<div><div class="meta"><span class="badge" style="color:${COLOR[d.s]}">${esc(SRC[d.s])}</span><span>${esc(fmtDate(d))}${media}${talk}</span></div>
+      <div class="ttl">${hl(esc(d.t))}</div><div class="snip">${snippet(d)}</div></div>
+      ${d.th ? `<img class="th" src="${esc(d.th)}" loading="lazy" alt="">` : ''}`;
+    frag.appendChild(el);
+  }
+  shown = end;
+  list.appendChild(frag);
+}
+const groupOf = d => state.sortUsed === 'comments' ? (ACTIVITY[d.id] ? 'Latest comments' : 'No comments yet') : (d.y || 'Undated');
+$('#list').addEventListener('scroll', e => { const l = e.target; if (l.scrollTop + l.clientHeight > l.scrollHeight - 600 && shown < results.length) more(); });
+$('#list').addEventListener('click', e => { const it = e.target.closest('.item'); if (it) open(it.dataset.id); });
+
+// ---------- facets / index
+function tally(fn, skip) {
+  const m = new Map();
+  for (const d of DOCS) if (d._match && passes(d, skip)) for (const k of [].concat(fn(d))) if (k) m.set(k, (m.get(k) || 0) + 1);
+  return m;
+}
+const expanded = {};
+function renderIndex() {
+  const box = $('#index');
+  const src = tally(d => d.s, 'src');
+  const yrs = tally(d => d.y || 'Undated', 'year');
+  const tags = tally(d => d.tags);  // not skipping 'tag': selected topics combine with AND, so counts show what adding each one leaves
+  const places = tally(d => d.loc, 'place');
+  const ph = tally(d => (d.ni || d.nv) ? 'y' : null, 'photos').get('y') || 0;
+  const lg = tally(d => d.w >= 150 ? 'y' : null, 'long').get('y') || 0;
+  const maxY = Math.max(1, ...yrs.values());
+  const opt = (kind, key, label, n, extra = '') =>
+    `<button class="opt${extra}" data-k="${kind}" data-v="${esc(key)}">${label}<span class="n">${n || 0}</span></button>`;
+  const on = (k, v) => (k === 'src' ? state.src.has(v) : state[k] === v) ? ' on' : '';
+  const list = (m, kind, limit) => {
+    const all = [...m].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    const cur = state[kind]; const lim = expanded[kind] ? all.length : limit;
+    let rows = all.slice(0, lim);
+    if (cur && !rows.some(r => r[0] === cur)) rows.unshift([cur, m.get(cur) || 0]);
+    return rows.map(([k, n]) => opt(kind, k, esc(k), n, on(kind, k))).join('') +
+      (all.length > limit ? `<button class="more" data-more="${kind}">${expanded[kind] ? 'Show fewer' : `Show all ${all.length}`}</button>` : '');
+  };
+  const topics = () => {
+    const sel = [...state.tags].map(k => [k, tags.get(k) || 0]);
+    const rest = [...tags].filter(([k]) => !state.tags.has(k)).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    const rows = sel.concat(expanded.tag ? rest : rest.slice(0, 12));
+    return rows.map(([k, n]) => opt('tag', k, esc(k), n, ' check' + (state.tags.has(k) ? ' on' : ''))).join('') +
+      (rest.length > 12 ? `<button class="more" data-more="tag">${expanded.tag ? 'Show fewer' : `Show all ${rest.length + sel.length}`}</button>` : '');
+  };
+  const years = [...yrs].sort((a, b) => b[0].localeCompare(a[0]));
+  box.innerHTML = `
+    <div class="facet"><h3>Sources ${state.src.size ? '<button data-clear="src">clear</button>' : ''}</h3>
+      ${Object.entries(SRC).map(([k, l]) => opt('src', k, `<span class="dot" style="background:${COLOR[k]}"></span>${esc(l)}`, src.get(k), on('src', k))).join('')}</div>
+    <div class="facet"><h3>Show</h3>
+      ${opt('photos', '1', 'Has photos or video', ph, ' check' + (state.photos ? ' on' : ''))}
+      ${opt('long', '1', 'Long reads (150+ words)', lg, ' check' + (state.long ? ' on' : ''))}</div>
+    ${COMMENTS ? `<div class="facet"><h3>Comments</h3>
+      ${opt('sort', 'comments', 'Latest comments first', tally(d => ACTIVITY[d.id] ? 'y' : null).get('y') || 0, ' check' + (state.sort === 'comments' ? ' on' : ''))}</div>` : ''}
+    ${tags.size || state.tags.size ? `<div class="facet"><h3>Tags ${state.tags.size ? '<button data-clear="tag">clear</button>' : ''}</h3>${topics()}</div>` : ''}
+    <div class="facet"><h3>Years ${state.year ? '<button data-clear="year">clear</button>' : ''}</h3>
+      ${years.map(([y, n]) => `<button class="opt${on('year', y)}" data-k="year" data-v="${y}">${y}<span class="bar"><i style="width:${n / maxY * 100}%"></i></span><span class="n">${n}</span></button>`).join('')}</div>
+    ${places.size ? `<div class="facet"><h3>Places ${state.place ? '<button data-clear="place">clear</button>' : ''}</h3>${list(places, 'place', 10)}</div>` : ''}`;
+}
+$('#index').addEventListener('click', e => {
+  const m = e.target.closest('[data-more]'); if (m) { expanded[m.dataset.more] = !expanded[m.dataset.more]; renderIndex(); return; }
+  const c = e.target.closest('[data-clear]'); if (c) { const k = c.dataset.clear; k === 'src' ? state.src.clear() : k === 'tag' ? state.tags.clear() : state[k] = null; run(); return; }
+  const o = e.target.closest('.opt'); if (!o) return;
+  const k = o.dataset.k, v = o.dataset.v;
+  if (k === 'src') state.src.has(v) ? state.src.delete(v) : state.src.add(v);
+  else if (k === 'tag') state.tags.has(v) ? state.tags.delete(v) : state.tags.add(v);
+  else if (k === 'photos' || k === 'long') state[k] = !state[k];
+  else if (k === 'sort') { state.sort = state.sort === 'comments' ? 'rel' : 'comments'; $('#sort').value = state.sort; }
+  else state[k] = state[k] === v ? null : v;
+  run();
+});
+function renderHead() {
+  const pills = [];
+  if (state.q) pills.push(['q', state.q.includes('"') ? state.q : `“${state.q}”`]);
+  state.src.forEach(s => pills.push(['src:' + s, SRC[s]]));
+  if (state.year) pills.push(['year', state.year]);
+  state.tags.forEach(t => pills.push(['tag:' + t, t]));
+  if (state.place) pills.push(['place', state.place]);
+  if (state.photos) pills.push(['photos', 'Has photos']);
+  if (state.long) pills.push(['long', 'Long reads']);
+  $('#rhead').innerHTML = `<span>${results.length.toLocaleString()} of ${DOCS.length.toLocaleString()}</span>` +
+    pills.map(([k, l]) => `<button class="pill" data-p="${esc(k)}">${esc(l)}</button>`).join('');
+}
+$('#rhead').addEventListener('click', e => {
+  const p = e.target.closest('.pill'); if (!p) return;
+  const k = p.dataset.p;
+  if (k === 'q') { state.q = ''; $('#q').value = ''; }
+  else if (k.startsWith('src:')) state.src.delete(k.slice(4));
+  else if (k.startsWith('tag:')) state.tags.delete(k.slice(4));
+  else if (k === 'photos' || k === 'long') state[k] = false;
+  else state[k] = null;
+  run();
+});
+function clearAll() { Object.assign(state, {q: '', year: null, place: null, photos: false, long: false}); state.src.clear(); state.tags.clear(); $('#q').value = ''; run(); }
+
+// ---------- reader
+function open(id, fromHash) {
+  const d = byId.get(id); if (!d) return;
+  state.doc = id;
+  document.querySelectorAll('.item.sel').forEach(e => e.classList.remove('sel'));
+  const it = document.querySelector(`.item[data-id="${CSS.escape(id)}"]`);
+  if (it) { it.classList.add('sel'); if (fromHash) it.scrollIntoView({block: 'center'}); }
+  const k = results.indexOf(d), prev = results[k - 1], next = results[k + 1];
+  const meta = [`<span class="badge" style="color:${COLOR[d.s]}">${esc(SRC[d.s])}</span>`, esc(d.dd || fmtDate(d))];
+  if (d.loc) meta.push('📍 ' + esc(d.loc));
+  if (d.ctx && d.ctx !== 'timeline') meta.push(esc(d.ctx));
+  meta.push(`${d.w.toLocaleString()} words`);
+  if (d.u) meta.push(`<a href="${esc(d.u)}" target="_blank" rel="noopener">original ↗</a>`);
+  const r = $('#reader');
+  r.innerHTML = `<button class="btn back" id="back">‹ Back</button><div class="doc">
+    <div class="meta">${meta.join('<span>·</span>')}</div>
+    ${d.st ? `<h1>${esc(d.t)}</h1>` : '<div style="height:1rem"></div>'}
+    <div class="body">${d.h}</div>
+    ${d.tags.length ? `<div class="tags">${d.tags.map(t => `<button data-tag="${esc(t)}">${esc(t)}</button>`).join('')}</div>` : ''}
+    <section class="comments" aria-label="Comments"><h2>Comments <small></small></h2><div class="thread"><p class="quiet">Loading comments…</p></div>${commentForm()}<div class="mod"></div></section>
+    <div class="nav">${prev ? `<button data-go="${esc(prev.id)}">‹ Previous<b>${esc(prev.t.slice(0, 70))}</b></button>` : ''}
+      ${next ? `<button data-go="${esc(next.id)}">Next ›<b>${esc(next.t.slice(0, 70))}</b></button>` : ''}</div></div>`;
+  r.scrollTop = 0;
+  markTerms(r.querySelector('.body'));
+  openedAt = Date.now();
+  loadComments(d, r.querySelector('.comments'));
+  document.body.classList.add('reading');
+  $('#back').onclick = () => document.body.classList.remove('reading');
+  syncHash();
+}
+function markTerms(root) {
+  const ts = terms.filter(t => !t.neg).map(t => t.t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  if (!ts.length) return;
+  const re = new RegExp(`(${ts.join('|')})`, 'gi');
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+  let first = null;
+  nodes.forEach(n => {
+    if (!re.test(n.nodeValue)) return; re.lastIndex = 0;
+    const span = document.createElement('span');
+    span.innerHTML = esc(n.nodeValue).replace(re, '<mark>$1</mark>');
+    n.replaceWith(span); first = first || span.querySelector('mark');
+  });
+  if (first) setTimeout(() => first.scrollIntoView({block: 'center'}), 30);
+}
+$('#reader').addEventListener('click', e => {
+  const g = e.target.closest('[data-go]'); if (g) { open(g.dataset.go, true); return; }
+  const t = e.target.closest('[data-tag]'); if (t) { state.tags.clear(); state.tags.add(t.dataset.tag); run(); return; }
+  const img = e.target.closest('.body img'); if (img) lightbox(img);
+});
+function welcome() {
+  const c = s => DOCS.filter(d => d.s === s).length;
+  const yrs = DOCS.map(d => d.y).filter(Boolean).sort();
+  $('#reader').innerHTML = `<div class="welcome"><h2>The writings archive</h2>
+    <div>${yrs[0]}–${yrs[yrs.length - 1]}</div>
+    <div class="stats">${Object.entries(SRC).map(([k, l]) => `<div><b>${c(k).toLocaleString()}</b>${esc(l)}</div>`).join('')}</div>
+    <p>Pick anything on the left, or search. Use <code>"quotes"</code> for phrases and <code>-word</code> to exclude.
+    Keys: <code>/</code> search · <code>j</code>/<code>k</code> next/previous · <code>Esc</code> clear.</p></div>`;
+}
+
+// ---------- comments. A piece's thread is <src>/comments-<name>.md: Markdown the comment service
+// (galedra-server/writings/comments) appends to, one "### name · time" section per comment with the
+// words quoted beneath and, for a reply, the id of the comment it answers; the page builds the tree
+// from those ids and shows the words as plain text. comments.json has each piece's count and the time
+// of its latest comment, for the list and its sort. A name given is remembered in this browser only,
+// and so is the key each post returns, which lets its author delete that comment from here. The
+// moderator signs in here to delete any comment.
+const COMMENTS = location.protocol.startsWith('http');
+const REMOVED = '[removed]', MAX_DEPTH = 4, NAME_KEY = 'wa-comment-name', OWN_KEY = 'wa-comment-own';
+let ACTIVITY = {};                          // piece id -> [count, time of the latest comment]
+let MOD = {admin: false, enabled: false};   // the moderator, as the comment service sees this browser
+let openedAt = 0;                           // when the piece on screen was opened, by this page's clock
+const lastOf = d => (ACTIVITY[d.id] || [0, ''])[1];
+const shortDate = iso => { const y = iso.slice(0, 4); return `${MONTHS[+iso.slice(5, 7) - 1]} ${+iso.slice(8, 10)}${y === String(new Date().getFullYear()) ? '' : ', ' + y}`; };
+const stampOf = iso => `${iso.slice(0, 10)} ${iso.slice(11, 16)} UTC`;
+const savedName = () => { try { return localStorage.getItem(NAME_KEY) || ''; } catch (e) { return ''; } };
+const keepName = n => { try { n ? localStorage.setItem(NAME_KEY, n) : localStorage.removeItem(NAME_KEY); } catch (e) {} };
+// comment id -> the key that deletes it, for the comments posted from this browser (the newest 1,000)
+const ownKeys = () => { try { return JSON.parse(localStorage.getItem(OWN_KEY) || '{}') || {}; } catch (e) { return {}; } };
+function keepOwn(id, key) {
+  const all = ownKeys(); delete all[id]; all[id] = key;
+  const ids = Object.keys(all); ids.slice(0, Math.max(0, ids.length - 1000)).forEach(k => delete all[k]);
+  try { localStorage.setItem(OWN_KEY, JSON.stringify(all)); } catch (e) {}
+}
+function dropOwn(id) { const all = ownKeys(); delete all[id]; try { localStorage.setItem(OWN_KEY, JSON.stringify(all)); } catch (e) {} }
+const threadUrl = d => `${d.s}/comments-${encodeURIComponent(d.id.slice(d.s.length + 1))}.md`;
+const postJson = (url, obj) => fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(obj)})
+  .then(async r => ({ok: r.ok, status: r.status, j: await r.json().catch(() => ({}))}));
+
+function parseThread(text) {
+  return text.split(/^### /m).slice(1).map(sec => {
+    const [head, ...rest] = sec.split('\n'), cut = head.lastIndexOf(' · ');
+    const meta = sec.match(/<!-- id ([0-9a-f]{8})(?: reply-to ([0-9a-f]{8}))? -->/) || [];
+    const body = rest.filter(l => l.startsWith('>')).map(l => l.replace(/^> ?/, '')).join('\n').trim();
+    return {id: meta[1] || '', parent: meta[2] || null, name: cut > 0 ? head.slice(0, cut) : head, at: cut > 0 ? head.slice(cut + 3) : '', body};
+  }).filter(c => c.body);
+}
+function commentHtml(c, byId, depth, mine) {
+  const gone = c.name === REMOVED, to = c.parent && byId.get(c.parent);
+  const tools = gone || !c.id ? '' : `<button class="act" type="button" data-reply="${esc(c.id)}">Reply</button>` +
+    (MOD.admin ? `<button class="act del" type="button" data-del="${esc(c.id)}">Delete</button>`
+      : mine[c.id] ? `<button class="act del" type="button" data-mine="${esc(c.id)}">Delete</button>` : '');
+  return `<div class="comment${gone ? ' gone' : ''}" data-cid="${esc(c.id)}">
+    <div class="who"><b>${gone ? 'Removed' : esc(c.name)}</b>${to ? `<span class="to">↳ ${esc(to.name === REMOVED ? 'a removed comment' : to.name)}</span>` : ''}<span>${esc(c.at)}</span>${tools}</div>
+    <p>${gone ? `This comment was removed by ${c.body.includes('its author') ? 'its author' : 'the moderator'}.` : esc(c.body).replace(/\n/g, '<br>')}</p>
+    <div class="replies${depth >= MAX_DEPTH ? ' flat' : ''}">${c.kids.map(k => commentHtml(k, byId, depth + 1, mine)).join('')}</div></div>`;
+}
+function renderThread(box) {
+  const cs = box.comments || [], byId = new Map(cs.map(c => [c.id, Object.assign(c, {kids: []})])), roots = [];
+  cs.forEach(c => (c.parent && byId.has(c.parent) ? byId.get(c.parent).kids : roots).push(c));
+  const mine = ownKeys();
+  box.querySelector('.thread').innerHTML = cs.length ? roots.map(c => commentHtml(c, byId, 1, mine)).join('') : '<p class="quiet">No comments yet.</p>';
+  const n = cs.filter(c => c.name !== REMOVED).length;
+  box.querySelector('h2 small').textContent = n ? `(${n})` : '';
+}
+function renderMod(box) {
+  const el = box.querySelector('.mod');
+  if (!COMMENTS || !MOD.enabled) { el.innerHTML = ''; return; }
+  el.innerHTML = MOD.admin ? 'Moderating: every comment can be deleted. <button type="button" data-signout>Sign out</button>'
+    : '<button type="button" data-signin>Moderator sign-in</button>';
+}
+async function loadComments(d, box) {
+  box.comments = [];
+  renderMod(box);
+  if (!COMMENTS) { box.querySelector('.thread').innerHTML = '<p class="quiet">Comments can be read and written on writings.galedra.org.</p>'; return; }
+  try {
+    const r = await fetch(threadUrl(d), {cache: 'no-cache'});
+    const cs = r.ok ? parseThread(await r.text()) : [];
+    if (state.doc !== d.id) return;
+    box.comments = cs;
+    renderThread(box);
+  } catch (e) { if (state.doc === d.id) box.querySelector('.thread').innerHTML = '<p class="quiet">The comments could not be loaded.</p>'; }
+}
+// what the list shows for a piece, from its thread as it now stands
+function noteActivity(d, box) {
+  const real = (box.comments || []).filter(c => c.name !== REMOVED);
+  const times = real.map(c => c.at.replace(' UTC', '').replace(' ', 'T') + ':00Z').sort();
+  if (real.length) ACTIVITY[d.id] = [real.length, times[times.length - 1]]; else delete ACTIVITY[d.id];
+  run(true);
+}
+function commentForm(parent) {
+  if (!COMMENTS) return '';
+  return `<form class="say${parent ? ' sub' : ''}"${parent ? ` data-parent="${esc(parent)}"` : ''} novalidate>
+    <label class="hp" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off"></label>
+    <textarea name="words" rows="${parent ? 3 : 4}" maxlength="2000" placeholder="${parent ? 'Write a reply…' : 'Add a comment…'}" aria-label="${parent ? 'Your reply' : 'Your comment'}"></textarea>
+    <div class="row"><input name="who" maxlength="40" placeholder="Name (optional)" aria-label="Name (optional)" autocomplete="nickname" value="${esc(savedName())}">
+      ${parent ? '<button class="btn" type="button" data-cancel>Cancel</button>' : ''}<button class="btn primary" type="submit">${parent ? 'Reply' : 'Post'}</button></div>
+    ${parent ? '' : '<p class="rules">Anonymous and public. No links, web or email addresses, or phone numbers; up to 2,000 characters. A name you give is remembered in this browser, and you can delete your comments from it.</p>'}
+    <p class="status" role="status" aria-live="polite"></p></form>`;
+}
+async function signIn(f) {
+  const status = f.querySelector('.status'), box = f.closest('.comments');
+  status.textContent = 'Signing in…'; status.className = 'status';
+  const r = await postJson('/api/comments/admin/login', {user: f.elements.user.value, password: f.elements.password.value}).catch(() => ({j: {}}));
+  if (!r.ok) { status.textContent = r.j.error || 'Signing in failed.'; status.className = 'status bad'; return; }
+  MOD.admin = true; renderMod(box); renderThread(box);
+}
+$('#reader').addEventListener('submit', async e => {
+  const f = e.target.closest('form.say, form.signin'); if (!f) return;
+  e.preventDefault();
+  if (f.classList.contains('signin')) return signIn(f);
+  const d = byId.get(state.doc), el = f.elements, box = f.closest('.comments'); if (!d) return;
+  const status = f.querySelector('.status'), btn = f.querySelector('button[type=submit]');
+  if (!el.words.value.trim()) { status.textContent = 'Write something first.'; status.className = 'status bad'; return; }
+  btn.disabled = true; status.textContent = 'Posting…'; status.className = 'status';
+  const r = await postJson('/api/comments', {doc: d.id, name: el.who.value, body: el.words.value, website: el.website.value,
+    parent: f.dataset.parent || null, elapsed: Date.now() - openedAt}).catch(() => ({j: {}}));
+  btn.disabled = false;
+  if (!r.ok || !r.j.comment) { status.textContent = r.j.error || 'Your comment could not be posted; try again in a moment.'; status.className = 'status bad'; return; }
+  keepName(el.who.value.trim());
+  box.querySelectorAll('form.say input[name=who]').forEach(i => { i.value = savedName(); });
+  const c = r.j.comment;
+  if (c.key) keepOwn(c.id, c.key);
+  box.comments.push({id: c.id, parent: c.parent || null, name: c.name, at: stampOf(c.at), body: c.body});
+  renderThread(box);   // a reply form lives in the thread, and goes with it
+  if (!f.dataset.parent) { el.words.value = ''; status.textContent = 'Posted.'; }
+  noteActivity(d, box);
+});
+$('#reader').addEventListener('click', async e => {
+  const box = e.target.closest('.comments'); if (!box) return;
+  const d = byId.get(state.doc); if (!d) return;
+  const reply = e.target.closest('[data-reply]');
+  if (reply) {
+    box.querySelectorAll('form.say.sub').forEach(x => x.remove());
+    const c = reply.closest('.comment');
+    c.querySelector(':scope > .replies').insertAdjacentHTML('beforebegin', commentForm(reply.dataset.reply));
+    c.querySelector(':scope > form.say textarea').focus();
+    return;
+  }
+  if (e.target.closest('[data-cancel]')) { e.target.closest('form').remove(); return; }
+  const mine = e.target.closest('[data-mine]');
+  if (mine) {
+    if (!confirm('Delete your comment? It cannot be undone.')) return;
+    const id = mine.dataset.mine;
+    const r = await postJson('/api/comments/delete', {doc: d.id, id, key: ownKeys()[id]}).catch(() => ({j: {}}));
+    if (!r.ok && r.status !== 404) { if (r.status === 403) dropOwn(id); alert(r.j.error || 'The comment could not be deleted.'); renderThread(box); return; }
+    dropOwn(id);
+    await loadComments(d, box);
+    noteActivity(d, box);
+    return;
+  }
+  const del = e.target.closest('[data-del]');
+  if (del) {
+    if (!confirm('Delete this comment? It cannot be undone.')) return;
+    const r = await postJson('/api/comments/admin/delete', {doc: d.id, id: del.dataset.del}).catch(() => ({j: {}}));
+    if (r.status === 401) { MOD.admin = false; renderMod(box); renderThread(box); alert(r.j.error || 'Sign in again to moderate.'); return; }
+    if (!r.ok && r.status !== 404) { alert(r.j.error || 'The comment could not be deleted.'); return; }
+    await loadComments(d, box);
+    noteActivity(d, box);
+    return;
+  }
+  if (e.target.closest('[data-signin]')) {
+    box.querySelector('.mod').innerHTML = `<form class="signin"><input name="user" placeholder="Name" autocomplete="username" aria-label="Moderator name">
+      <input name="password" type="password" placeholder="Password" autocomplete="current-password" aria-label="Password">
+      <button class="btn primary" type="submit">Sign in</button><button class="btn" type="button" data-unsign>Cancel</button><p class="status" role="status" aria-live="polite"></p></form>`;
+    box.querySelector('.mod input').focus();
+    return;
+  }
+  if (e.target.closest('[data-unsign]')) { renderMod(box); return; }
+  if (e.target.closest('[data-signout]')) {
+    await postJson('/api/comments/admin/logout', {}).catch(() => {});
+    MOD.admin = false; renderMod(box); renderThread(box);
+  }
+});
+
+// ---------- lightbox
+let lbImgs = [], lbI = 0;
+function lightbox(img) { lbImgs = [...img.closest('.body').querySelectorAll('img')]; lbI = lbImgs.indexOf(img); showLb(); $('#lb').classList.add('open'); }
+function showLb() { $('#lb img').src = lbImgs[lbI].src; $('#lb .count').textContent = lbImgs.length > 1 ? `${lbI + 1} / ${lbImgs.length}` : ''; }
+$('#lb').addEventListener('click', e => {
+  if (e.target.classList.contains('prev')) { lbI = (lbI - 1 + lbImgs.length) % lbImgs.length; showLb(); }
+  else if (e.target.classList.contains('next')) { lbI = (lbI + 1) % lbImgs.length; showLb(); }
+  else $('#lb').classList.remove('open');
+});
+
+// ---------- input, keys, hash
+let timer;
+$('#q').addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => { state.q = e.target.value.trim(); if (state.q && state.sort !== 'rel') {} run(); }, 110); });
+$('#sort').addEventListener('change', e => { state.sort = e.target.value; run(); });
+$('#ft').addEventListener('click', () => $('#index').classList.toggle('open'));
+document.addEventListener('keydown', e => {
+  const lbOpen = $('#lb').classList.contains('open');
+  if (lbOpen) { if (e.key === 'Escape') $('#lb').classList.remove('open'); if (e.key === 'ArrowLeft') $('#lb .prev').click(); if (e.key === 'ArrowRight') $('#lb .next').click(); return; }
+  const typing = e.target.matches('input, select, textarea'), inSearch = e.target.id === 'q';
+  if (e.key === '/' && !typing) { e.preventDefault(); $('#q').focus(); $('#q').select(); return; }
+  if (e.key === 'Escape') { if (inSearch) { $('#q').blur(); if ($('#q').value) { $('#q').value = ''; state.q = ''; run(); } } else if (typing) e.target.blur(); else document.body.classList.remove('reading'); return; }
+  if (typing) {
+    if (e.key === 'Enter' && inSearch && results[0]) { open(results[0].id, true); $('#q').blur(); }
+    else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && e.target.form && e.target.form.classList.contains('say')) e.target.form.requestSubmit();
+    return;
+  }
+  if (e.key === 'j' || e.key === 'k') {
+    const k = results.findIndex(d => d.id === state.doc);
+    const n = results[e.key === 'j' ? k + 1 : Math.max(0, k - 1)];
+    if (n) { while (results.indexOf(n) >= shown) more(); open(n.id, true); }
+  }
+});
+function syncHash() {
+  const p = new URLSearchParams();
+  if (state.q) p.set('q', state.q);
+  if (state.tags.size) p.set('tags', [...state.tags].join(','));
+  if (state.doc) p.set('doc', state.doc);
+  const h = p.toString();
+  if (location.hash.slice(1) !== h) history.replaceState(null, '', h ? '#' + h : location.pathname);
+}
+const root = document.documentElement;
+try { const t = localStorage.getItem('wa-theme'); if (t) root.dataset.theme = t; } catch (e) {}
+$('#theme').addEventListener('click', () => {
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+  try { localStorage.setItem('wa-theme', root.dataset.theme); } catch (e) {}
+});
+
+$('#sub').textContent = `${DOCS.length.toLocaleString()} pieces · ${DATA.built}`;
+const init = new URLSearchParams(location.hash.slice(1));
+state.q = init.get('q') || ''; $('#q').value = state.q;
+(init.get('tags') || '').split(',').filter(t => byTag.has(t)).forEach(t => state.tags.add(t));
+run();
+if (init.get('doc') && byId.has(init.get('doc'))) open(init.get('doc'), true); else welcome();
+if (COMMENTS) {
+  fetch('comments.json', {cache: 'no-cache'}).then(r => r.ok ? r.json() : {}).then(a => { ACTIVITY = a || {}; run(true); }).catch(() => {});
+  fetch('/api/comments/admin', {cache: 'no-store'}).then(r => r.ok ? r.json() : null).then(a => {
+    if (!a) return;
+    MOD = a;
+    const box = document.querySelector('.comments');
+    if (box) { renderMod(box); if (MOD.admin) renderThread(box); }
+  }).catch(() => {});
+}
+})();
+</script>
+</body>
+</html>

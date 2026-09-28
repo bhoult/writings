@@ -1,0 +1,34 @@
+---
+title: "SCAREWARE"
+date: "2017-05-12"
+display_date: "2017-05-12, 4:02 PM CDT"
+source: "facebook"
+context: "timeline"
+tags: [technology, advice]
+---
+# SCAREWARE
+
+SCAREWARE
+What you donât click canât hurt you.
+
+(tldr) If something dire warning pops up on your computer instructing you to performs some action, click a link or call a number, take note of what you did immediately prior to that, then hold down the power button until your computer shuts down.  Do not click anything or do what they ask.  If it keeps happening then contact an IT support specialist and get help.
+---
+For most of human history we have struggled to find good information.  We looked for secret tricks, new opportunities, great deals.  WIth the advent of mass media and then the internet suddenly we find ourselves inundated with more information than we know how to deal with.  Today the new skill we need is how to filter out the false information from everything coming at us from all directions.  For those not born into this environment there is still an assumption that published information can be assumed to be trustworthy.  Scammers use a multitude of methods to exploit this trust.  
+
+It is almost impossible to function in today's society without using computers and the internet in some form.  This means that many users will reluctantly be online and will only want to know the minimum necessary to get their job done.  They donât want to think about viruses, scammers, hackers, malware or any of the dangers.  Unfortunately this lack of education is precisely what leaves them vulnerable.
+
+Computer based scams generally fall into a range of categories with purely technical attacks on one end and purely social attacks on the other.  A technical attack targets software, vulnerabilities in the operating system or a particular piece of software.  There is an ongoing war between âhackersâ and software companies.  New software might have a number of weaknesses âholesâ that hackers can use to gain access or control.  As these are discovered software vendors will fix them and issue updates.  This is why regularly updating your software is critical, and has recently become automatic and even mandatory in most operating systems.  In general the end user only needs to know that they need to keep their virus protection up to date, and their software updates current to avoid most of this.
+
+On the other end are the social attacks.  As software becomes more secure it is becoming easier to target the actual userâ¦ you.  The goal here is to trick the user into somehow circumventing the security that exists on their operating system or bank account, or other online account.  They do this by suggesting that there is some irresistible, secret, exclusive opportunity that you canât afford to miss out on.  In the real world Bill Gates is not trying to give away his money, the widow of a deposed Nigerian prince does not need to use your bank account to get funds out of their country, you did not win some lottery from a contest that you donât remember ever entering.  
+
+In the classic sales tactic of âbait and switchâ the above try to tempt you with the bait, on the other side is the âswitchâ in which they attempt to scare you into action.  This latest scam is what is known as âscarewareâ.  If you are browsing the web and suddenly a popup in your browser informs you that your PC is infected and you need to click a button or call a number before your world falls apart then scammers are trying to exploit your uncertainty to cause you to do something that will allow them to do real harm.  Microsoft will not call you to tell you they need remote access to your computer to âfixâ anything.  The IRS will not call you to demand access to your bank account to avoid an audit. 
+
+A legitimate company does not need your password to get information from their own systems.  If they direct you to an insecure (http:// connection instead of https://) or if the url does not belong to the actual company they claim to represent (https://microsoft.scammer.com vs https://microsoft.com) then you are certainly being scammed.  Do not click the link, or call the number.  Just close the browser tab or window.  If someone calls you and asks you to install software or provide credit card numbers or bank account information or allow them to access your computer for any reason just hang up.  If in doubt just hold down your power button until your computer shuts off.  You may lose the document you are working on but anything else may make the problem worse.  If you really think it may be legitimate then lookup and call the relevant institution yourself and ask them about it. 
+
+Browsers are designed to be isolated from the rest of your system.  They are incapable of testing for viruses or examining anything on your PC.  If the warning comes from some software other than the browser then your PC is likely infected.  In this case you need to run some form of antivirus or malware removal or in the worst case, reinstall your operating system. 
+
+The goal of the scammers is to gain access to resources that you pay for in order to use them for their own ends.  In the worst case this may be draining your bank account or charging your credit card.  If they trick you into installing something or allowing them access to your PC then they will likely be able to access your email.  If they get that then they can probably find where you signed up for your bank, or any other online account.  They can request a password reset, which will send you a notification email for approval which they can then submit without your knowledge.
+
+In other cases they may just be using your computer's processing or bandwidth to extort money,  mine bitcoins,  send spam or host ads or files.  If they used legitimate means then their IP address would be blocked or ther account would be closed by the host.  By using your computer along with thousands of others for this purpose ISPâs are unable to block them fast enough to stop the problem.  All you may notice is that your computer or network connection is really slow sometimes.  You are not impacted directly but now you are part of the problem.  The scareware screens that people see may be coming from your home computer without your knowledge.
+
+In the end it is not that complicated to avoid these issues.  Update your software, regularly scan for viruses, and donât click on or respond to any dire warnings or unlikely windfalls that appear in your browser or email.  Just shut down the computer and reboot.  If you are unsure then look up the actual company they claim to represent and contact them directly.  Do not click the link or call the number.
