@@ -1,5 +1,7 @@
 # Writings Archive
 
+Written by [Brandon Hoult](https://hoult.co).
+
 Everything in one place, no external dependencies. One Markdown file per piece,
 grouped by source, named `YYYY-MM-DD-title-slug`. Images and videos live alongside
 as local files referenced by relative path.
